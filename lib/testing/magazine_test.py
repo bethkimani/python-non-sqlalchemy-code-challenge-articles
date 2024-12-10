@@ -1,82 +1,3 @@
-# classes/many_to_many.py
-
-class Author:
-    """Author class to represent authors in the system"""
-    
-    def __init__(self, name):
-        self.name = name
-
-    def __repr__(self):
-        return self.name
-
-
-class Article:
-    """Article class to represent articles written by authors in magazines"""
-
-    all = []
-
-    def __init__(self, author, magazine, title):
-        self.author = author
-        self.magazine = magazine
-        self.title = title
-        Article.all.append(self)
-
-    def __repr__(self):
-        return self.title
-
-
-class Magazine:
-    """Magazine class representing a magazine with many articles and many contributors"""
-    
-    all = []
-
-    def __init__(self, name, category):
-        if not isinstance(name, str) or not isinstance(category, str):
-            raise Exception("Name and Category must be strings")
-        if len(name) < 2 or len(name) > 16:
-            raise Exception("Magazine name must be between 2 and 16 characters")
-        if len(category) == 0:
-            raise Exception("Category cannot be an empty string")
-        
-        self.name = name
-        self.category = category
-        self.articles_list = []
-        Magazine.all.append(self)
-
-    def articles(self):
-        """Returns all articles associated with the magazine"""
-        return [article for article in Article.all if article.magazine == self]
-
-    def contributors(self):
-        """Returns all unique authors who have written for the magazine"""
-        contributors = {article.author for article in self.articles()}
-        return list(contributors)
-
-    def article_titles(self):
-        """Returns a list of titles of articles in the magazine"""
-        articles = self.articles()
-        return [article.title for article in articles] if articles else None
-
-    def contributing_authors(self):
-        """Returns authors who have written more than 2 articles for the magazine"""
-        authors = {}
-        for article in self.articles():
-            authors[article.author] = authors.get(article.author, 0) + 1
-        return [author for author, count in authors.items() if count > 2]
-
-    @classmethod
-    def top_publisher(cls):
-        """Returns the magazine with the most articles"""
-        if not cls.all:
-            return None
-        return max(cls.all, key=lambda magazine: len(magazine.articles()))
-
-    def __repr__(self):
-        return self.name
-
-
-# tests/magazine_test.py
-
 import pytest
 from classes.many_to_many import Article
 from classes.many_to_many import Magazine
@@ -84,7 +5,7 @@ from classes.many_to_many import Author
 
 
 class TestMagazine:
-    """Magazine in many_to_many.py"""
+    """Tests for Magazine in many_to_many.py"""
 
     def test_has_name(self):
         """Magazine is initialized with a name"""
@@ -105,11 +26,6 @@ class TestMagazine:
         magazine_1.name = "New Yorker"
         assert magazine_1.name == "New Yorker"
 
-        # comment out the next two lines if using Exceptions
-        #magazine_2.name = 2
-        #assert magazine_2.name == "AD"
-
-        # uncomment the next two lines if using Exceptions
         with pytest.raises(Exception):
             Magazine(2, "Numbers")
 
@@ -121,19 +37,9 @@ class TestMagazine:
         assert 2 <= len(magazine_1.name) <= 16
         assert 2 <= len(magazine_2.name) <= 16
 
-        # comment out the next two lines if using Exceptions
-        #magazine_1.name = "New Yorker Plus X"
-        #assert magazine_1.name == "Vogue"
-
-        # comment out the next two lines if using Exceptions
-        #magazine_2.name = "A"
-        #assert magazine_2.name == "AD"
-
-        # uncomment the next two lines if using Exceptions
         with pytest.raises(Exception):
             magazine_1.name = "New Yorker Plus X"
 
-        # uncomment the next two lines if using Exceptions
         with pytest.raises(Exception):
             magazine_2.name = "A"
 
@@ -156,15 +62,6 @@ class TestMagazine:
         magazine_1.category = "Life Style"
         assert magazine_1.category == "Life Style"
 
-        assert isinstance(magazine_1.category, str)
-
-        # comment out the next two lines if using Exceptions
-        #magazine_2.category = 2
-        #assert magazine_2.category == "Architecture"
-        
-        assert isinstance(magazine_2.category, str)
-
-        # uncomment the next two lines if using Exceptions
         with pytest.raises(Exception):
             Magazine("GQ", 2)
 
@@ -174,12 +71,6 @@ class TestMagazine:
 
         assert magazine_1.category != ""
 
-        # comment out the next three lines if using Exceptions
-        #magazine_1.category = ""
-        # magazine_1.category == "Fashion"
-        #assert magazine_1.category != ""
-
-        # uncomment the next two lines if using Exceptions
         with pytest.raises(Exception):
             magazine_1.category = ""
 
@@ -244,4 +135,6 @@ class TestMagazine:
         Article(author_1, magazine_1, "How to be single and happy")
         Article(author_2, magazine_1, "Dating life in NYC")
 
-        assert len(set(magazine_1.contributors())) == len
+        # Call the method to get contributors and check if they are unique
+        contributors = magazine_1.contributors()
+        assert len(set(contributors)) == len(contributors)
